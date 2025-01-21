@@ -1,0 +1,45 @@
+networks:
+  camagru_network:
+    driver: bridge
+
+services:
+  # Full nginx reverse proxy server
+  server:
+    container_name: server
+    networks:
+      - camagru_network
+    build:
+      context: ./server
+      dockerfile: ./Dockerfile
+    image: server
+    ports:
+      - 80:80
+    depends_on:
+      - app
+
+  # JavaScript frontend application
+  app:
+    container_name: app
+    networks:
+      - camagru_network
+    build:
+      context: ./app
+      dockerfile: ./Dockerfile
+    image: app
+    expose:
+      - 8080
+    volumes:
+      - ./app/src:/var/www/html:ro
+
+  db:
+    container_name: db
+    networks:
+      - camagru_network
+    build:
+      context: ./db
+      dockerfile: ./Dockerfile
+    image: db
+    expose:
+      - 3306
+    env_file:
+      - ./.env
