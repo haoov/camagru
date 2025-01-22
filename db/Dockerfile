@@ -14,6 +14,5 @@ COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-#
-# CMD ["mysqld", "--bind-address=0.0.0.0"]
-CMD ["tail", "-f", "/dev/null"]
+
+CMD ["mysqld", "--user=mysql", "--bind-address=0.0.0.0"]

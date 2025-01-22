@@ -13,6 +13,8 @@ CREATE USER '${DB_ADMIN}'@'%' IDENTIFIED BY '${DB_ADMIN_PASSWD}';
 GRANT ALL ON \`${DB_NAME}\`.* TO '${DB_ADMIN}'@'%';
 FLUSH PRIVILEGES;
 EOF
+
+  mariadb-admin -p${DB_ROOT_PASSWD} shutdown
 fi
 
 exec "$@"

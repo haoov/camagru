@@ -32,6 +32,7 @@ services:
       - ./app/src:/var/www/html:ro
 
   db:
+    # Mariadb database
     container_name: db
     networks:
       - camagru_network
@@ -39,7 +40,21 @@ services:
       context: ./db
       dockerfile: ./Dockerfile
     image: db
-    expose:
-      - 3306
+    # expose:
+    #   - 3306
+    ports:
+      - 3306:3306
+    env_file:
+      - ./.env
+
+  api:
+    # Php CRUD api
+    container_name: api
+    networks:
+      - camagru_network
+    build:
+      context: ./api
+      dockerfile: ./Dockerfile
+    image: api
     env_file:
       - ./.env
