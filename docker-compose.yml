@@ -9,13 +9,14 @@ services:
     networks:
       - camagru_network
     build:
-      context: ./server
+      context: ./server/docker
       dockerfile: ./Dockerfile
     image: server
     ports:
       - 80:80
     depends_on:
-      - app
+      api:
+        condition: service_healthy
 
   # JavaScript frontend application
   app:
@@ -23,7 +24,7 @@ services:
     networks:
       - camagru_network
     build:
-      context: ./app
+      context: ./app/docker
       dockerfile: ./Dockerfile
     image: app
     expose:
@@ -37,24 +38,40 @@ services:
     networks:
       - camagru_network
     build:
-      context: ./db
+      context: ./db/docker
       dockerfile: ./Dockerfile
     image: db
-    # expose:
-    #   - 3306
-    ports:
-      - 3306:3306
+    expose:
+      - 3306
     env_file:
       - ./.env
+    healthcheck:
+      test: "mariadb-admin ping -p${DB_ROOT_PASSWD}"
+      retries: 10
+      interval: 2s
 
   api:
-    # Php CRUD api
+    # Php REST api
     container_name: api
     networks:
       - camagru_network
     build:
-      context: ./api
+      context: ./api/docker
       dockerfile: ./Dockerfile
+      args:
+        DB_HOSTNAME: ${DB_HOSTNAME}
+        DB_NAME: ${DB_NAME}
+        DB_ADMIN: ${DB_ADMIN}
+        DB_ADMIN_PASSWD: ${DB_ADMIN_PASSWD}
     image: api
-    env_file:
-      - ./.env
+    volumes:
+      - ./api/src:/api:ro
+    expose:
+      - 9000
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: "nc -z localhost 9000"
+      retries: 10
+      interval: 2s
