@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Class representing the database
+ * @method connect
+ * @method init
+ * @method execute_query
+ * */
 class Database {
 	private string $host;
 	private string $name;
@@ -14,6 +20,9 @@ class Database {
 		$this->passwd = getenv("DB_ADMIN_PASSWD");
 	}
 
+	/**
+	 * Connect to the database
+	 * */
 	public function connect(): void {
 		$dsn = "mysql:host=$this->host;dbname=$this->name;charset=utf8mb4";
 
@@ -26,6 +35,9 @@ class Database {
 		}
 	}
 	
+	/**
+	 * Initiliaze the database with sql script
+	 * */
 	public function init(): void {
 		$script = file_get_contents("./init.sql");
 
@@ -38,10 +50,11 @@ class Database {
 	}
 
     /**
-     * @param string $query
-     * @param array $args
-     * @param boolean $one
-     * @return array
+	 * Execute given query with parameters and return the result
+     * @param string $query the query to be executed
+     * @param array $args arguments for the query
+     * @param boolean $one indicate if the function should fetch only one rows
+     * @return array array of returned rows
      */
     public function execute_query($query, $args, $one=true): array {
 		try {
